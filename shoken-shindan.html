@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>あなたに合う証券口座を診断｜5問30秒</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+background: #0d1b2a !important;
+}
+
+body {
+font-family: ‘Noto Sans JP’, sans-serif;
+background: #0d1b2a;
+color: #e8f4f8;
+min-height: 100vh;
+padding: 0;
+}
+
+.wrap {
+max-width: 520px;
+margin: 0 auto;
+padding: 0 0 40px;
+}
+
+/* ========== ヘッダー ========== */
+.header {
+background: #0d1b2a;
+padding: 24px 20px 0;
+text-align: center;
+}
+
+.header-badge {
+display: inline-block;
+background: linear-gradient(90deg, #2ec4b6, #4ab3d4);
+color: #0d1b2a;
+font-size: 12px;
+font-weight: 900;
+padding: 5px 16px;
+border-radius: 999px;
+margin-bottom: 14px;
+letter-spacing: 0.05em;
+}
+
+.header-title {
+font-size: 28px;
+font-weight: 900;
+line-height: 1.35;
+color: #fff;
+margin-bottom: 6px;
+}
+
+.header-title span { color: #2ec4b6; }
+
+.header-sub {
+font-size: 13px;
+color: #8ab8cc;
+margin-bottom: 20px;
+}
+
+/* ========== プログレスバー ========== */
+.progress-wrap {
+padding: 0 20px;
+margin-bottom: 4px;
+}
+
+.progress-bar-bg {
+height: 4px;
+background: rgba(255,255,255,0.12);
+border-radius: 2px;
+overflow: hidden;
+}
+
+.progress-bar-fill {
+height: 100%;
+background: linear-gradient(90deg, #2ec4b6, #4ab3d4);
+border-radius: 2px;
+transition: width 0.4s ease;
+}
+
+.progress-label {
+text-align: right;
+font-size: 12px;
+color: #5a8090;
+padding: 4px 0 0;
+}
+
+/* ========== 質問カード ========== */
+.card {
+margin: 12px 20px 0;
+background: #112233;
+border: 1px solid rgba(78,179,212,0.25);
+border-radius: 18px;
+padding: 22px 18px 18px;
+}
+
+.q-badge {
+display: inline-block;
+background: linear-gradient(90deg, #2ec4b6, #4ab3d4);
+color: #0d1b2a;
+font-size: 11px;
+font-weight: 900;
+padding: 4px 14px;
+border-radius: 999px;
+margin-bottom: 14px;
+letter-spacing: 0.08em;
+}
+
+.q-text {
+font-size: 20px;
+font-weight: 900;
+color: #fff;
+line-height: 1.4;
+margin-bottom: 6px;
+}
+
+.q-hint {
+font-size: 13px;
+color: #8ab8cc;
+margin-bottom: 18px;
+}
+
+/* 選択肢 */
+.choices {
+display: flex;
+flex-direction: column;
+gap: 10px;
+margin-bottom: 18px;
+}
+
+.choice-btn {
+background: #1a2e42;
+border: 1.5px solid rgba(255,255,255,0.14);
+border-radius: 12px;
+padding: 14px 16px;
+font-size: 15px;
+font-weight: 700;
+color: #e8f4f8;
+cursor: pointer;
+text-align: left;
+transition: border-color 0.2s, background 0.2s, transform 0.1s;
+-webkit-tap-highlight-color: transparent;
+line-height: 1.4;
+}
+
+.choice-btn:active { transform: scale(0.98); }
+
+.choice-btn.selected {
+border-color: #2ec4b6;
+background: rgba(46,196,182,0.15);
+color: #fff;
+}
+
+/* 次へボタン */
+.next-btn {
+display: block;
+width: 100%;
+padding: 16px;
+background: linear-gradient(90deg, #2ec4b6, #4ab3d4);
+color: #0d1b2a;
+font-size: 16px;
+font-weight: 900;
+border: none;
+border-radius: 999px;
+cursor: pointer;
+transition: opacity 0.2s, transform 0.1s;
+-webkit-tap-highlight-color: transparent;
+}
+
+.next-btn:disabled {
+opacity: 0.35;
+cursor: default;
+}
+
+.next-btn:not(:disabled):active { transform: scale(0.97); }
+
+/* 免責 */
+.disclaimer {
+font-size: 11px;
+color: #3a5a68;
+text-align: center;
+margin-top: 14px;
+padding: 0 4px;
+line-height: 1.6;
+}
+
+/* ========== ローディング ========== */
+.loading-screen {
+display: none;
+text-align: center;
+padding: 60px 20px 40px;
+}
+
+.loading-dots {
+display: flex;
+justify-content: center;
+gap: 8px;
+margin-bottom: 24px;
+}
+
+.loading-dot {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background: #2ec4b6;
+animation: dotBounce 1.2s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(2) { animation-delay: 0.2s; background: #4ab3d4; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; background: #6a9fb8; }
+
+@keyframes dotBounce {
+0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+40% { opacity: 1; transform: scale(1.2); }
+}
+
+.loading-text {
+font-size: 16px;
+font-weight: 700;
+color: #8ab8cc;
+}
+
+/* ========== 結果画面 ========== */
+.result-screen {
+display: none;
+padding: 0 20px 20px;
+}
+
+.result-header {
+text-align: center;
+padding: 20px 0 16px;
+}
+
+.result-badge {
+display: inline-block;
+background: linear-gradient(90deg, #2ec4b6, #4ab3d4);
+color: #0d1b2a;
+font-size: 12px;
+font-weight: 900;
+padding: 5px 16px;
+border-radius: 999px;
+margin-bottom: 14px;
+}
+
+.result-title {
+font-size: 22px;
+font-weight: 900;
+color: #fff;
+line-height: 1.4;
+margin-bottom: 4px;
+}
+
+.result-sub {
+font-size: 12px;
+color: #8ab8cc;
+}
+
+/* 1位カード */
+.result-first {
+background: #0e2a28;
+border: 1.5px solid rgba(46,196,182,0.5);
+border-radius: 16px;
+padding: 20px 18px;
+margin-bottom: 14px;
+}
+
+.rank-badge-1 {
+display: inline-block;
+background: linear-gradient(90deg, #f0a500, #e08a00);
+color: #fff;
+font-size: 12px;
+font-weight: 900;
+padding: 4px 14px;
+border-radius: 999px;
+margin-bottom: 12px;
+}
+
+.result-name {
+font-size: 28px;
+font-weight: 900;
+color: #fff;
+margin-bottom: 12px;
+line-height: 1.2;
+}
+
+.result-tags {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+margin-bottom: 14px;
+}
+
+.result-tag {
+background: rgba(46,196,182,0.15);
+border: 1px solid rgba(46,196,182,0.4);
+color: #2ec4b6;
+font-size: 12px;
+font-weight: 700;
+padding: 4px 12px;
+border-radius: 999px;
+}
+
+.match-label {
+display: flex;
+justify-content: space-between;
+font-size: 12px;
+color: #8ab8cc;
+margin-bottom: 6px;
+}
+
+.match-label span:last-child { color: #2ec4b6; font-weight: 900; }
+
+.match-bar-bg {
+height: 6px;
+background: rgba(255,255,255,0.12);
+border-radius: 3px;
+overflow: hidden;
+margin-bottom: 14px;
+}
+
+.match-bar-fill {
+height: 100%;
+background: linear-gradient(90deg, #2ec4b6, #4ab3d4);
+border-radius: 3px;
+transition: width 0.8s ease 0.3s;
+}
+
+.result-desc {
+font-size: 14px;
+color: #c8dde6;
+line-height: 1.8;
+background: #0d1f2d;
+border-radius: 10px;
+padding: 12px 14px;
+margin-bottom: 16px;
+}
+
+.result-cta-btn {
+display: block;
+width: 100%;
+padding: 16px;
+border-radius: 999px;
+font-size: 15px;
+font-weight: 900;
+text-align: center;
+text-decoration: none;
+color: #fff;
+transition: opacity 0.2s, transform 0.1s;
+-webkit-tap-highlight-color: transparent;
+}
+
+.result-cta-btn:active { transform: scale(0.97); }
+.result-cta-btn:hover { opacity: 0.88; }
+
+.result-cta-sub {
+font-size: 11px;
+text-align: center;
+margin-top: 6px;
+opacity: 0.7;
+}
+
+/* 2位・3位 */
+.result-others-label {
+font-size: 12px;
+color: #5a8090;
+margin: 16px 0 10px;
+letter-spacing: 0.05em;
+}
+
+.result-other {
+background: #112233;
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 14px;
+padding: 16px 16px;
+margin-bottom: 10px;
+}
+
+.rank-badge-other {
+display: inline-block;
+background: rgba(255,255,255,0.12);
+color: #8ab8cc;
+font-size: 11px;
+font-weight: 700;
+padding: 3px 12px;
+border-radius: 999px;
+margin-bottom: 8px;
+}
+
+.other-name {
+font-size: 18px;
+font-weight: 900;
+color: #fff;
+margin-bottom: 8px;
+}
+
+.other-desc {
+font-size: 13px;
+color: #8ab8cc;
+line-height: 1.7;
+margin-bottom: 12px;
+}
+
+.other-link {
+display: inline-block;
+border: 1.5px solid rgba(46,196,182,0.5);
+color: #2ec4b6;
+font-size: 13px;
+font-weight: 700;
+padding: 8px 20px;
+border-radius: 999px;
+text-decoration: none;
+transition: background 0.2s;
+}
+
+.other-link:hover { background: rgba(46,196,182,0.1); }
+
+/* もう一度 */
+.retry-btn {
+display: block;
+width: 100%;
+margin-top: 16px;
+padding: 14px;
+background: #1a2e42;
+border: 1.5px solid rgba(255,255,255,0.15);
+border-radius: 999px;
+color: #8ab8cc;
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+text-align: center;
+transition: background 0.2s;
+-webkit-tap-highlight-color: transparent;
+}
+
+.retry-btn:hover { background: #223a52; }
+
+/* 免責（結果画面） */
+.result-disclaimer {
+font-size: 11px;
+color: #3a5a68;
+text-align: center;
+margin-top: 20px;
+line-height: 1.6;
+}
+
+/* フェードアニメ */
+.fade-in {
+animation: fadeIn 0.35s ease forwards;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(10px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ヘッダー（常時表示） -->
+
+  <div class="header">
+    <div class="header-badge" id="headerBadge">🏦 5問診断・30秒</div>
+    <h1 class="header-title">あなたに合う<br><span>証券口座</span>を診断</h1>
+    <p class="header-sub">初心者ママのNISA×ポイント最適化</p>
+  </div>
+
+  <!-- プログレス（質問中のみ） -->
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width:20%"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">Q1 / 5</div>
+  </div>
+
+  <!-- 質問カード -->
+
+  <div class="card fade-in" id="questionCard">
+    <div class="q-badge" id="qBadge">QUESTION 1</div>
+    <div class="q-text" id="qText">ふだん何のポイントを貯めてる？</div>
+    <div class="q-hint" id="qHint">💡 一番よく使うポイントを選んでください</div>
+    <div class="choices" id="choicesWrap"></div>
+    <button class="next-btn" id="nextBtn" disabled>次の質問へ →</button>
+    <p class="disclaimer">※診断結果はライフスタイルに基づく参考情報です。詳細・審査条件は各社公式サイトをご確認ください。</p>
+  </div>
+
+  <!-- ローディング -->
+
+  <div class="card loading-screen" id="loadingScreen">
+    <div class="loading-dots">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
+    <div class="loading-text">あなたに最適な証券口座を診断中…</div>
+    <p class="disclaimer" style="margin-top:32px;">※診断結果はライフスタイルに基づく参考情報です。詳細・審査条件は各社公式サイトをご確認ください。</p>
+  </div>
+
+  <!-- 結果 -->
+
+  <div class="result-screen" id="resultScreen"></div>
+
+</div>
+
+<script>
+// =============================================
+// 質問データ
+// =============================================
+const QUESTIONS = [
+  {
+    text: 'ふだん何のポイントを貯めてる？',
+    hint: '💡 一番よく使うポイントを選んでください',
+    choices: [
+      { label: '🛒 楽天ポイント',         value: 'rakuten' },
+      { label: '📱 dポイント（ドコモ）',   value: 'monex'   },
+      { label: '💳 Vポイント（三井住友）', value: 'sbi'     },
+      { label: '🏪 Pontaポイント',         value: 'gmo'     },
+      { label: '🌐 特に決まってない',       value: 'matsui'  },
+    ]
+  },
+  {
+    text: '月の積立予定額はどのくらい？',
+    hint: '💡 無理なく続けられる金額で選んでね',
+    choices: [
+      { label: '💴 〜1万円くらい',           value: 'matsui'  },
+      { label: '💴 1〜3万円くらい',          value: 'rakuten' },
+      { label: '💴 3〜5万円くらい',          value: 'monex'   },
+      { label: '💴 5万円以上（100万円修行も狙いたい）', value: 'sbi' },
+    ]
+  },
+  {
+    text: '投資の経験はどのくらい？',
+    hint: '💡 正直に答えてください😊',
+    choices: [
+      { label: '🔰 まったくない・初めて',     value: 'matsui'  },
+      { label: '📖 少し調べたことはある',     value: 'rakuten' },
+      { label: '📊 NISAや積立は知ってる',     value: 'monex'   },
+      { label: '💹 株やETFにも興味あり',      value: 'sbi'     },
+    ]
+  },
+  {
+    text: 'サポート重視？コスト重視？',
+    hint: '💡 あなたの優先度を教えて',
+    choices: [
+      { label: '🤝 困ったとき電話で聞きたい', value: 'matsui'  },
+      { label: '📱 アプリが使いやすければOK', value: 'rakuten' },
+      { label: '💰 ポイント還元率を最大化したい', value: 'monex' },
+      { label: '🏆 実績・ラインナップ重視',   value: 'sbi'     },
+    ]
+  },
+  {
+    text: '口座を開設したい一番の理由は？',
+    hint: '💡 固定費・食費・日用品など合計で',
+    choices: [
+      { label: '🌱 新NISAでコツコツ積立したい',  value: 'rakuten' },
+      { label: '📈 株や個別銘柄にも挑戦したい',   value: 'sbi'     },
+      { label: '🎁 ポイ活と組み合わせたい',       value: 'monex'   },
+      { label: '🔰 まず試しに使ってみたい',       value: 'matsui'  },
+    ]
+  },
+];
+
+// =============================================
+// 証券口座データ
+// =============================================
+const BROKERS = {
+  rakuten: {
+    name: '楽天証券',
+    tags: ['楽天ポイント還元', 'クレカ積立対応', '初心者◎'],
+    match: 98,
+    desc: '楽天カード×楽天市場ユーザーに最強の選択肢。カードと口座を紐づけるだけで積立＋ポイント還元がセット。アプリも見やすく、設定が少ないのでとにかくラクに続けられます😊',
+    ctaText: '👉 楽天証券 口座開設はこちら（無料）',
+    ctaSub: 'スマホで完結・楽天ポイント還元',
+    ctaColor: 'linear-gradient(135deg, #e84040, #bf0000)',
+    ctaUrl: 'https://ad2.trafficgate.net/t/r/1231/738/317053_396208',
+    ctaRel: 'nofollow',
+  },
+  monex: {
+    name: 'マネックス証券',
+    tags: ['dポイント還元1.1%', 'ドコモ連携◎', 'NISA対応'],
+    match: 96,
+    desc: 'dポイントをよく使う方にイチオシ。クレカ積立の還元率1.1%は主要5社の中でトップクラス。ドコモのサービスと組み合わせると、日々のお買い物ポイントをそのまま新NISAの積立に回せます📱',
+    ctaText: '👉 マネックス証券 口座開設はこちら',
+    ctaSub: 'dポイント還元1.1%・NISA完全対応',
+    ctaColor: 'linear-gradient(135deg, #2a6fbd, #1a4f9a)',
+    ctaUrl: 'https://h.accesstrade.net/sp/cc?rk=0100q1bu00opbw',
+    ctaRel: 'nofollow',
+    ctaPixel: '<img src="https://h.accesstrade.net/sp/rr?rk=0100q1bu00opbw" width="1" height="1" border="0" alt="">',
+  },
+  matsui: {
+    name: '松井証券',
+    tags: ['電話サポート充実', '初心者◎', 'NISA対応'],
+    match: 94,
+    desc: '「操作に自信がない」「困ったらすぐ聞きたい」というママに最適。サポート体制の手厚さは業界トップクラスで、電話・チャットで丁寧に教えてもらえます。初めての方が失敗しにくい設計です📞',
+    ctaText: '👉 松井証券 口座開設はこちら（無料）',
+    ctaSub: '電話サポート充実・初心者に最適',
+    ctaColor: 'linear-gradient(135deg, #e08a00, #b36e00)',
+    ctaUrl: 'https://px.a8.net/svt/ejp?a8mat=4AX9GH+CRMNSI+3XCC+64C3M',
+    ctaRel: 'nofollow',
+    ctaPixel: '<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4AX9GH+CRMNSI+3XCC+64C3M" alt="">',
+  },
+  gmo: {
+    name: 'GMOクリック証券',
+    tags: ['シンプル設計', 'コスト重視◎', 'NISA対応'],
+    match: 90,
+    desc: 'シンプルで使いやすいインターフェースが特徴。「余計な機能は要らない、積立だけできれば十分」という方にぴったり。あおぞら銀行との連携で普通預金金利もお得になるメリットも💹',
+    ctaText: '👉 GMOクリック証券 口座開設はこちら',
+    ctaSub: 'シンプル設計・コスト最小化',
+    ctaColor: 'linear-gradient(135deg, #1a9e92, #0d7a70)',
+    ctaUrl: 'https://px.a8.net/svt/ejp?a8mat=4AZCG4+EAEJG2+YX8+C3J0I',
+    ctaRel: 'nofollow',
+    ctaPixel: '<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4AZCG4+EAEJG2+YX8+C3J0I" alt="">',
+  },
+  sbi: {
+    name: 'SBI証券',
+    tags: ['業界最大手', '商品数No.1', '総合力◎'],
+    match: 95,
+    desc: '口座数・商品ラインナップともに業界トップクラス。三井住友カードとの組み合わせでVポイントも貯まります。「株もやってみたい」「将来的に色々試したい」という方の長期的なメインロに最適🏆',
+    ctaText: '👉 SBI証券の口座開設ガイドを見る',
+    ctaSub: '業界最大手・NISA対応完璧',
+    ctaColor: 'linear-gradient(135deg, #9a78e0, #7050c0)',
+    ctaUrl: 'https://www.nisa-nurse.com/entry/2026/02/17/090157',
+    ctaRel: 'noopener',
+  },
+};
+
+// =============================================
+// 診断ロジック
+// =============================================
+const RANK_ORDER = ['rakuten','sbi','monex','matsui','gmo'];
+
+// 2位・3位の固定説明文（1位によって変わる）
+const OTHERS_DESC = {
+  rakuten: {
+    sbi:    '実績・商品数重視の方にはSBI証券も人気。三井住友カードと組み合わせるとVポイントも貯まります',
+    monex:  'dポイントをよく使うならマネックス証券もおすすめ。還元率1.1%で長期的にお得です',
+    matsui: '初めてで不安な方には松井証券のサポート体制も魅力的。電話でいつでも聞けます',
+    gmo:    'シンプルに積立だけしたい方はGMOクリック証券もあり。余計な機能なくスッキリ使えます',
+  },
+  monex: {
+    rakuten:'楽天ユーザーなら楽天証券も要チェック。楽天カードと組み合わせれば設定がラクに完結します',
+    sbi:    '幅広い商品を使いたいならSBI証券も。業界最大手で長期的な安心感があります',
+    matsui: 'サポートが充実した松井証券も選択肢のひとつ。初心者ママに優しい設計です',
+    gmo:    'シンプル設計のGMOクリック証券。余計な機能なく積立に集中できます',
+  },
+  matsui: {
+    rakuten:'楽天ポイントも貯めたいなら楽天証券を併用するのもアリ。楽天カードと組み合わせると便利です',
+    sbi:    '将来的に投資の幅を広げたいならSBI証券も。商品数・実績ともに業界No.1です',
+    monex:  'dポイントをお持ちならマネックス証券も検討を。還元率1.1%でコツコツお得になります',
+    gmo:    'コスト重視ならGMOクリック証券もシンプルで使いやすい選択肢です',
+  },
+  sbi: {
+    rakuten:'楽天経済圏ユーザーなら楽天証券も有力な選択肢。カードと口座の連携が超スムーズです',
+    monex:  'dポイントも活用したいならマネックス証券をサブとして検討してみて。還元率1.1%は優秀です',
+    matsui: '操作に不安があれば松井証券のサポートも頼りになります。困ったらすぐ電話できます',
+    gmo:    'シンプル積立に特化したいGMOクリック証券。余計な機能なくすっきり使えます',
+  },
+  gmo: {
+    rakuten:'楽天ポイントを活かしたいなら楽天証券も検討を。楽天カードと組み合わせれば設定が少なく完結します',
+    sbi:    '長期投資・幅広い商品を使いたいならSBI証券が業界最大手で安心感があります',
+    monex:  'dポイントをお持ちならマネックス証券の還元率1.1%もコツコツお得になります',
+    matsui: 'サポート充実の松井証券も初心者ママにおすすめ。電話でいつでも相談できます',
+  },
+};
+
+// =============================================
+// アプリ状態
+// =============================================
+let currentQ = 0;
+let answers  = [];   // 各質問で選んだvalue
+let selected = null; // 現在選択中
+
+// =============================================
+// 描画
+// =============================================
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  selected = null;
+
+  document.getElementById('qBadge').textContent  = `QUESTION ${currentQ + 1}`;
+  document.getElementById('qText').textContent   = q.text;
+  document.getElementById('qHint').textContent   = q.hint;
+  document.getElementById('progressFill').style.width  = `${((currentQ + 1) / 5) * 100}%`;
+  document.getElementById('progressLabel').textContent = `Q${currentQ + 1} / 5`;
+
+  const nextBtn   = document.getElementById('nextBtn');
+  const isLastQ   = currentQ === QUESTIONS.length - 1;
+  nextBtn.textContent = isLastQ ? '診断結果を見る 🎉' : '次の質問へ →';
+  nextBtn.disabled    = true;
+
+  const wrap = document.getElementById('choicesWrap');
+  wrap.innerHTML = '';
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className   = 'choice-btn';
+    btn.textContent = c.label;
+    btn.addEventListener('click', () => selectChoice(i, c.value, btn));
+    wrap.appendChild(btn);
+  });
+
+  // フェードアニメ
+  const card = document.getElementById('questionCard');
+  card.classList.remove('fade-in');
+  void card.offsetWidth;
+  card.classList.add('fade-in');
+}
+
+function selectChoice(idx, value, btnEl) {
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btnEl.classList.add('selected');
+  selected = value;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function goNext() {
+  if (selected === null) return;
+  answers.push(selected);
+
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    showLoading();
+  }
+}
+
+// =============================================
+// ローディング→結果
+// =============================================
+function showLoading() {
+  document.getElementById('questionCard').style.display  = 'none';
+  document.getElementById('progressWrap').style.display  = 'none';
+  document.getElementById('loadingScreen').style.display = 'block';
+
+  setTimeout(showResult, 1800);
+}
+
+function calcResult() {
+  // スコア集計
+  const score = { rakuten: 0, monex: 0, matsui: 0, gmo: 0, sbi: 0 };
+  answers.forEach(v => { if (score[v] !== undefined) score[v]++; });
+
+  // 同点時はRANK_ORDERで優先度決定
+  const sorted = RANK_ORDER.slice().sort((a, b) => {
+    if (score[b] !== score[a]) return score[b] - score[a];
+    return RANK_ORDER.indexOf(a) - RANK_ORDER.indexOf(b);
+  });
+  return sorted; // 1位〜5位
+}
+
+function showResult() {
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('progressWrap').style.display  = 'none';
+
+  const ranked = calcResult();
+  const first  = ranked[0];
+  const second = ranked[1];
+  const third  = ranked[2];
+
+  const b1 = BROKERS[first];
+  const b2 = BROKERS[second];
+  const b3 = BROKERS[third];
+
+  const desc2 = (OTHERS_DESC[first] && OTHERS_DESC[first][second]) || b2.desc.slice(0, 50) + '…';
+  const desc3 = (OTHERS_DESC[first] && OTHERS_DESC[first][third])  || b3.desc.slice(0, 50) + '…';
+
+  const html = `
+    <div class="result-header fade-in">
+      <div class="result-badge">✨ 診断完了！</div>
+      <div class="result-title">あなたへの<br>ベスト口座は…</div>
+      <div class="result-sub">5項目をスコアリングした結果です</div>
+    </div>
+
+    <div class="result-first fade-in">
+      <div class="rank-badge-1">🥇 1位 ベストマッチ</div>
+      <div class="result-name">${b1.name}</div>
+      <div class="result-tags">
+        ${b1.tags.map(t => `<span class="result-tag">${t}</span>`).join('')}
+      </div>
+      <div class="match-label">
+        <span>マッチ度</span>
+        <span>${b1.match}%</span>
+      </div>
+      <div class="match-bar-bg">
+        <div class="match-bar-fill" id="matchBar1" style="width:0%"></div>
+      </div>
+      <div class="result-desc">${b1.desc}</div>
+      <a href="${b1.ctaUrl}" target="_blank" rel="${b1.ctaRel}"
+         class="result-cta-btn"
+         style="background:${b1.ctaColor}">
+        ${b1.ctaText}
+      </a>
+      <div class="result-cta-sub" style="color:#8ab8cc;">${b1.ctaSub}</div>
+      ${b1.ctaPixel || ''}
+    </div>
+
+    <div class="result-others-label">他のおすすめ</div>
+
+    <div class="result-other fade-in">
+      <div class="rank-badge-other">🥈 2位</div>
+      <div class="other-name">${b2.name}</div>
+      <div class="other-desc">${desc2}</div>
+      <a href="${b2.ctaUrl}" target="_blank" rel="${b2.ctaRel}" class="other-link">
+        → 公式サイトを見る
+      </a>
+      ${b2.ctaPixel || ''}
+    </div>
+
+    <div class="result-other fade-in">
+      <div class="rank-badge-other">🥉 3位</div>
+      <div class="other-name">${b3.name}</div>
+      <div class="other-desc">${desc3}</div>
+      <a href="${b3.ctaUrl}" target="_blank" rel="${b3.ctaRel}" class="other-link">
+        → 公式サイトを見る
+      </a>
+      ${b3.ctaPixel || ''}
+    </div>
+
+    <button class="retry-btn" onclick="resetDiag()">🔄 もう一度診断する</button>
+
+    <p class="result-disclaimer">
+      ※診断結果はライフスタイルに基づく参考情報です。<br>
+      詳細・審査条件は各社公式サイトをご確認ください。
+    </p>
+  `;
+
+  const screen = document.getElementById('resultScreen');
+  screen.innerHTML = html;
+  screen.style.display = 'block';
+
+  // マッチ度バーをアニメーション
+  setTimeout(() => {
+    const bar = document.getElementById('matchBar1');
+    if (bar) bar.style.width = b1.match + '%';
+  }, 200);
+}
+
+// =============================================
+// リセット
+// =============================================
+function resetDiag() {
+  currentQ = 0;
+  answers  = [];
+  selected = null;
+
+  document.getElementById('resultScreen').style.display  = 'none';
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('progressWrap').style.display  = 'block';
+  document.getElementById('questionCard').style.display  = 'block';
+
+  renderQuestion();
+}
+
+// =============================================
+// イベント
+// =============================================
+document.getElementById('nextBtn').addEventListener('click', goNext);
+
+// 初期描画
+renderQuestion();
+</script>
+
+</body>
+</html>
